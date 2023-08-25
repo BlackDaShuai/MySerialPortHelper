@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/new/prefix1">
+        <file>recf/warnSanjiao.ico</file>
+        <file>recf/warning.ico</file>
+        <file>recf/buz.ico</file>
+    </qresource>
+</RCC>
