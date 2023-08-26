@@ -6,7 +6,10 @@
 #include <QSerialPort>
 #include <QSerialPortInfo>
 #include <QPlainTextEdit>
-
+#include "qcustomplot.h"
+#include <QDateTime>
+#include <QTimer>
+#include <QFont>
 
 
 QT_BEGIN_NAMESPACE
@@ -23,6 +26,9 @@ public:
 
 public:
     QSerialPort *Serial = new QSerialPort();
+//    QFont lastFont;
+//    QPalette pletRed;
+//    QPalette pletBlack;
 
 //    bool isHexadecimal(const QString &str);已改为正则
 
@@ -46,6 +52,10 @@ private slots:
 
 
     void on_btnDraw_stateChanged(int arg1);
+
+    QString upDateTime(bool arg);
+
+    void on_sbFontSize_valueChanged(int arg1);
 
 private:
     Ui::Widget *ui;

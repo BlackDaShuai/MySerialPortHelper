@@ -2,24 +2,39 @@
 #include "ui_widget.h"
 #include <QMessageBox>
 #include <QRegularExpression>
+#include <QFont>
 //#include <QTextCharFormat>
+
+QFont font;
+
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::Widget)
 {
     ui->setupUi(this);
 
-
-//    ui->splitter->moveSplitter(100,1);
+    //设置默认波特率
     ui->cbBaudRate->setCurrentText("115200");
-
+    //设置默认分割条位置
     QList<int> sizes;
-    sizes << 10000 << 30000;
+    sizes << 30000 << 50000;
     ui->splitter->setSizes(sizes);
-//    splitter.setSizes(sizes);
 
+    //保存当前字体，用于后续临时修改颜色
+//    QPalette pletRed;
+//    pletRed.setColor(QPalette::Text,Qt::red);
+//    QPalette pletBlack;
+//    pletBlack.setColor(QPalette::Text,Qt::black);
+
+
+    //字体的spinbox初始大小
+    ui->sbFontSize->setValue(9);
+
+    //串口接收区刷新
     connect(Serial,&QSerialPort::readyRead,this,&Widget::showSerialData);
 }
+
+
 
 Widget::~Widget()
 {
@@ -27,6 +42,9 @@ Widget::~Widget()
 }
 
 QRegularExpression hexRegex("[A-Fa-f0-9]{2}");
+
+
+
 
 //QTextCharFormat style;
 ////字体色
@@ -58,6 +76,25 @@ QRegularExpression hexRegex("[A-Fa-f0-9]{2}");
 //}
 
 
+//时间获取函数，bool为0时为串口时间戳请求，bool为1时为charts时间轴请求
+QString Widget::upDateTime(bool arg)
+{
+    QTime current_time =QTime::currentTime();
+    if(arg)
+    {
+
+        return "111111111111";
+    }else
+    {
+        QString timeNow = current_time.toString();
+//        QString msNow = QString::number(current_time.msec());此方法会导致位数不统一
+        QString msNow = QString("").asprintf("%03d###",current_time.msec());//强制三位数，空位补0
+        return "###"+timeNow+" "+msNow;
+    }
+
+//    ui->receiveEdit->insertPlainText(current_time.toString());
+//    ui->receiveEdit->insertPlainText(current_time.msec());
+}
 
 
 void Widget::on_clear_clicked()
@@ -66,10 +103,6 @@ void Widget::on_clear_clicked()
 }
 
 
-bool isHexadecimal(const QString &str) {
-
-    return hexRegex.match(str).hasMatch();
-}
 
 /*Todo:
  ********* 将串口的名字写在端口号后面
@@ -153,9 +186,11 @@ void Widget::on_open_clicked()
         //调整串口控制按钮的文字提示
         ui->open->setText(QString("关闭串口"));
         ui->receiveEdit->appendPlainText("串口已连接！");
+        ui->lbConnected->setText("当前已连接");
     }else/* if(ui->open->text() == QString("关闭串口"))*/
     {
         ui->receiveEdit->appendPlainText("串口已关闭！");
+        ui->lbConnected->setText("当前未连接");
         Serial->close();
         ui->cbBaudRate->setEnabled(true);
         ui->cbDataBits->setEnabled(true);
@@ -174,6 +209,18 @@ void Widget::showSerialData()
 
     if(ui->chk0x16Show->isChecked())
         data = data.toHex();
+
+    if(ui->chkTimeShow->isChecked())//打印时间戳
+    {
+        ui->receiveEdit->insertPlainText("\r\n");
+
+        ui->receiveEdit->insertPlainText(upDateTime(0));
+
+        ui->receiveEdit->insertPlainText("\r\n");
+
+
+    }
+
 
 
     ui->receiveEdit->insertPlainText(QString(data));
@@ -247,5 +294,17 @@ void Widget::on_btnDraw_stateChanged(int arg1)
     default:break;
     }
 
+}
+
+
+
+
+void Widget::on_sbFontSize_valueChanged(int arg1)
+{
+    //字体
+    QFont font;
+    font.setPointSize(arg1);
+    ui->receiveEdit->setFont(font);
+    ui->sendEdit->setFont(font);
 }
 
