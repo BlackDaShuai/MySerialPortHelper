@@ -11,6 +11,12 @@ Widget::Widget(QWidget *parent)
 
 
 //    ui->splitter->moveSplitter(100,1);
+    ui->cbBaudRate->setCurrentText("115200");
+
+    QList<int> sizes;
+    sizes << 10000 << 30000;
+    ui->splitter->setSizes(sizes);
+//    splitter.setSizes(sizes);
 
     connect(Serial,&QSerialPort::readyRead,this,&Widget::showSerialData);
 }
@@ -225,5 +231,21 @@ void Widget::on_clearSend_clicked()
 void Widget::on_receiveEdit_textChanged()
 {
     ui->receiveEdit->moveCursor(QTextCursor::End);
+}
+
+
+
+
+
+void Widget::on_btnDraw_stateChanged(int arg1)
+{
+    //0未选中，2完全选中
+    switch(arg1)
+    {
+    case 0:ui->groupBox_7->setVisible(0);break;
+    case 2:ui->groupBox_7->setVisible(1);break;
+    default:break;
+    }
+
 }
 

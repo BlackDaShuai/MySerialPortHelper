@@ -19,18 +19,18 @@
   </property>
   <layout class="QGridLayout" name="gridLayout_4">
    <item row="0" column="0">
-    <layout class="QHBoxLayout" name="horizontalLayout" stretch="2,10">
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="2,4">
      <item>
       <widget class="QGroupBox" name="groupBox">
        <property name="minimumSize">
         <size>
-         <width>170</width>
+         <width>160</width>
          <height>0</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>170</width>
+         <width>160</width>
          <height>16777215</height>
         </size>
        </property>
@@ -264,6 +264,16 @@
            </widget>
           </item>
           <item>
+           <widget class="QCheckBox" name="btnDraw">
+            <property name="text">
+             <string>开启绘制</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QCheckBox" name="chkClearAfterSend">
             <property name="text">
              <string>每次发完清空发送区</string>
@@ -327,7 +337,7 @@
         </property>
         <property name="maximumSize">
          <size>
-          <width>300</width>
+          <width>100000</width>
           <height>16777215</height>
          </size>
         </property>
@@ -380,7 +390,7 @@
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_4" stretch="3,1">
          <item>
-          <widget class="QCustomPlot" name="widget" native="true"/>
+          <widget class="QCustomPlot" name="cusplot" native="true"/>
          </item>
          <item>
           <widget class="QGroupBox" name="groupBox_5">
