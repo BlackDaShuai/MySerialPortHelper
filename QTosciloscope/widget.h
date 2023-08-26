@@ -5,6 +5,7 @@
 
 #include <QSerialPort>
 #include <QSerialPortInfo>
+#include <QPlainTextEdit>
 
 
 
@@ -23,7 +24,9 @@ public:
 public:
     QSerialPort *Serial = new QSerialPort();
 
-    bool isHexadecimal(const QString &str);
+//    bool isHexadecimal(const QString &str);已改为正则
+
+//    void oneLineColorful(QString text, QPlainTextEdit* plainTextEdit,int fontSize, QColor fontColor, QColor backColor);
 private slots:
 
 
@@ -38,6 +41,8 @@ private slots:
     void on_send_clicked();
 
     void on_clearSend_clicked();
+
+    void on_receiveEdit_textChanged();
 
 private:
     Ui::Widget *ui;

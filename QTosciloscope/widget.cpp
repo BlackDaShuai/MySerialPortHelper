@@ -2,11 +2,15 @@
 #include "ui_widget.h"
 #include <QMessageBox>
 #include <QRegularExpression>
+//#include <QTextCharFormat>
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::Widget)
 {
     ui->setupUi(this);
+
+
+//    ui->splitter->moveSplitter(100,1);
 
     connect(Serial,&QSerialPort::readyRead,this,&Widget::showSerialData);
 }
@@ -17,6 +21,38 @@ Widget::~Widget()
 }
 
 QRegularExpression hexRegex("[A-Fa-f0-9]{2}");
+
+//QTextCharFormat style;
+////字体色
+//style.setForeground(QBrush(Qt::black));
+////fmt.setUnderlineColor("red");
+
+////背景色
+//style.setBackground(QBrush(Qt::white));
+////字体大小
+//style.setFontPointSize(9);
+
+//void oneLineColorful(QString text, QPlainTextEdit* plainTextEdit,int fontSize, QColor fontColor, QColor backColor)
+//{
+//    QTextCharFormat fmt;
+//    //字体色
+//    fmt.setForeground(QBrush(fontColor));
+//    //fmt.setUnderlineColor("red");
+
+//    //背景色
+//    fmt.setBackground(QBrush(backColor));
+//    //字体大小
+//    fmt.setFontPointSize(fontSize);
+//    //文本框使用以上设定
+//    plainTextEdit->mergeCurrentCharFormat(fmt);
+//    //文本框添加文本
+//    plainTextEdit->appendPlainText(text);
+
+//    plainTextEdit->mergeCurrentCharFormat();
+//}
+
+
+
 
 void Widget::on_clear_clicked()
 {
@@ -98,7 +134,7 @@ void Widget::on_open_clicked()
 
         if(Serial->open(QIODevice::ReadWrite)==false)
         {
-            QMessageBox::warning(this, "提示", "串口打开失败！", QMessageBox::Ok);
+            QMessageBox::warning(this, "提示", "串口打开失败或已被占用！", QMessageBox::Ok);
             return;
         }
 
@@ -113,6 +149,7 @@ void Widget::on_open_clicked()
         ui->receiveEdit->appendPlainText("串口已连接！");
     }else/* if(ui->open->text() == QString("关闭串口"))*/
     {
+        ui->receiveEdit->appendPlainText("串口已关闭！");
         Serial->close();
         ui->cbBaudRate->setEnabled(true);
         ui->cbDataBits->setEnabled(true);
@@ -182,5 +219,11 @@ void Widget::on_send_clicked()
 void Widget::on_clearSend_clicked()
 {
     ui->sendEdit->clear();
+}
+
+
+void Widget::on_receiveEdit_textChanged()
+{
+    ui->receiveEdit->moveCursor(QTextCursor::End);
 }
 
