@@ -258,16 +258,16 @@
              </layout>
             </item>
             <item>
-             <widget class="QPushButton" name="clear">
+             <widget class="QPushButton" name="open">
               <property name="text">
-               <string>清空接收</string>
+               <string>打开串口</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="open">
+             <widget class="QPushButton" name="clear">
               <property name="text">
-               <string>打开串口</string>
+               <string>清空接收</string>
               </property>
              </widget>
             </item>

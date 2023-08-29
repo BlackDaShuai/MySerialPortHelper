@@ -3,7 +3,7 @@
 
 #include <QComboBox>
 #include <QMouseEvent>
-//创建一个基类是combobox的类
+//创建一个父类是combobox的类
 class MyComboBox : public QComboBox
 {
     Q_OBJECT

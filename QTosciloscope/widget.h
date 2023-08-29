@@ -50,7 +50,6 @@ private slots:
 
     void on_receiveEdit_textChanged();
 
-
     void on_btnDraw_stateChanged(int arg1);
 
     QString upDateTime(bool arg);

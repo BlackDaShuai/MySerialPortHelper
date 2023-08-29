@@ -13,6 +13,16 @@ Widget::Widget(QWidget *parent)
 {
     ui->setupUi(this);
 
+
+
+    ui->cusplot->addGraph();
+
+    //设置xy轴的标签
+    ui->cusplot->xAxis->setLabel("时间");
+    ui->cusplot->yAxis->setLabel("值");
+    ui->cusplot->xAxis->setRange(0,5);
+    ui->cusplot->yAxis->setRange(-5,5);
+
     //设置默认波特率
     ui->cbBaudRate->setCurrentText("115200");
     //设置默认分割条位置
@@ -30,7 +40,10 @@ Widget::Widget(QWidget *parent)
     //字体的spinbox初始大小
     ui->sbFontSize->setValue(9);
 
+    Widget::on_cbPortName_clicked();
+
     //串口接收区刷新
+    disconnect(Serial,&QSerialPort::readyRead,this,&Widget::showSerialData);
     connect(Serial,&QSerialPort::readyRead,this,&Widget::showSerialData);
 }
 
@@ -96,7 +109,7 @@ QString Widget::upDateTime(bool arg)
 //    ui->receiveEdit->insertPlainText(current_time.msec());
 }
 
-
+//清空
 void Widget::on_clear_clicked()
 {
     ui->receiveEdit->clear();
@@ -107,6 +120,7 @@ void Widget::on_clear_clicked()
 /*Todo:
  ********* 将串口的名字写在端口号后面
  */
+//检测串口
 void Widget::on_cbPortName_clicked()
 {
     QString lastPortName = ui->cbPortName->currentText();
@@ -121,10 +135,10 @@ void Widget::on_cbPortName_clicked()
         ui->cbPortName->setCurrentText(lastPortName);
 
     }
-    ui->receiveEdit->appendPlainText("检测端口完毕");
+    ui->receiveEdit->appendPlainText("检测端口完毕\r\n");
 
 }
-
+//打开串口，赋值串口属性
 void Widget::on_open_clicked()
 {
 
@@ -167,7 +181,7 @@ void Widget::on_open_clicked()
             case 3: Serial->setDataBits(QSerialPort::Data5);break;
             default:break;
         }
-
+        Serial->setReadBufferSize(500);
         Serial->setFlowControl(QSerialPort::NoFlowControl);
 
 
@@ -185,11 +199,11 @@ void Widget::on_open_clicked()
         ui->cbStopBits->setEnabled(false);
         //调整串口控制按钮的文字提示
         ui->open->setText(QString("关闭串口"));
-        ui->receiveEdit->appendPlainText("串口已连接！");
+        ui->receiveEdit->appendPlainText("串口已连接！\r\n");
         ui->lbConnected->setText("当前已连接");
     }else/* if(ui->open->text() == QString("关闭串口"))*/
     {
-        ui->receiveEdit->appendPlainText("串口已关闭！");
+        ui->receiveEdit->appendPlainText("串口已关闭！\r\n");
         ui->lbConnected->setText("当前未连接");
         Serial->close();
         ui->cbBaudRate->setEnabled(true);
@@ -202,28 +216,53 @@ void Widget::on_open_clicked()
 
 
 }
-
+//串口数据显示，信号是串口readReady
 void Widget::showSerialData()
 {
-    QByteArray data = Serial->readAll();
 
-    if(ui->chk0x16Show->isChecked())
-        data = data.toHex();
-
-    if(ui->chkTimeShow->isChecked())//打印时间戳
+    qDebug()<<"shou";
+    if(Serial->bytesAvailable()>0)
     {
-        ui->receiveEdit->insertPlainText("\r\n");
+        qDebug()<<"asd awd ";
+        QByteArray data = Serial->readAll();
+        if(ui->chk0x16Show->isChecked())
+        {
+//            data = data.toHex();
+            QString temp = "";
+            QString hex = data.toHex();
+            for (int i = 0; i < hex.length(); i = i + 2) {
+                temp += hex.mid(i, 2) + " ";
+            }
 
-        ui->receiveEdit->insertPlainText(upDateTime(0));
+            hex = temp.trimmed().toUpper();
+            data = hex.toUtf8();
 
-        ui->receiveEdit->insertPlainText("\r\n");
+        }
 
+
+
+        if(ui->chkTimeShow->isChecked())//打印时间戳
+        {
+            ui->receiveEdit->insertPlainText("\r\n");
+
+            ui->receiveEdit->insertPlainText(upDateTime(0));
+
+            ui->receiveEdit->insertPlainText("\r\n");
+
+
+        }
+
+
+//        QString toData = QString(data);
+        QString toData = QString::fromUtf8(data);
+        ui->receiveEdit->insertPlainText(toData);
+        qDebug()<<toData;
 
     }
 
 
 
-    ui->receiveEdit->insertPlainText(QString(data));
+
 }
 
 void Widget::on_send_clicked()
@@ -235,7 +274,8 @@ void Widget::on_send_clicked()
         return;
     }
 
-    QByteArray sendData = ui->sendEdit->toPlainText().toUtf8();
+
+    QByteArray sendData = ui->sendEdit->toPlainText().toLocal8Bit();
 
     int count = sendData.size();
 
@@ -257,33 +297,36 @@ void Widget::on_send_clicked()
 
     //发送新行
     if(ui->chkNewLine->isChecked())
+    {
+//        QString string = QString(sendData);
+//        string += "\r\n";
+//        sendData = string.toUtf8();
+
         sendData.insert(count,"\r\n");
-
-
+    }
+    //发送数据到串口
     Serial->write(sendData);
+    qDebug()<<QString(sendData);
 
     if(ui->chkClearAfterSend->isChecked())
         ui->sendEdit->clear();
 
-    ui->sendEdit->setFocus();
+    ui->sendEdit->setFocus();//确保光标还在sendEdit，方便输入
 }
 
-
+//发完清空
 void Widget::on_clearSend_clicked()
 {
     ui->sendEdit->clear();
 }
 
-
+//移动receiveEdit光标到末尾
 void Widget::on_receiveEdit_textChanged()
 {
     ui->receiveEdit->moveCursor(QTextCursor::End);
 }
 
-
-
-
-
+//隐藏绘制区
 void Widget::on_btnDraw_stateChanged(int arg1)
 {
     //0未选中，2完全选中
@@ -296,9 +339,7 @@ void Widget::on_btnDraw_stateChanged(int arg1)
 
 }
 
-
-
-
+//设置字体大小
 void Widget::on_sbFontSize_valueChanged(int arg1)
 {
     //字体
