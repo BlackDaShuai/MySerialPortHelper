@@ -431,7 +431,11 @@
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_4" stretch="3,1">
          <item>
-          <widget class="QCustomPlot" name="cusplot" native="true"/>
+          <layout class="QGridLayout" name="gridLayout_7">
+           <item row="0" column="0">
+            <widget class="QCustomPlot" name="cusplot" native="true"/>
+           </item>
+          </layout>
          </item>
          <item>
           <widget class="QGroupBox" name="groupBox_5">
@@ -487,18 +491,18 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>QCustomPlot</class>
+   <extends>QWidget</extends>
+   <header>../../qcustomplot.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>MyComboBox</class>
    <extends>QComboBox</extends>
    <header>mycombobox.h</header>
    <slots>
     <signal>clicked()</signal>
    </slots>
-  </customwidget>
-  <customwidget>
-   <class>QCustomPlot</class>
-   <extends>QWidget</extends>
-   <header location="global">qcustomplot.h</header>
-   <container>1</container>
   </customwidget>
  </customwidgets>
  <tabstops>

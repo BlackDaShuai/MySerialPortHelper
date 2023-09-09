@@ -22,7 +22,11 @@ class Widget : public QWidget
 
 public:
     Widget(QWidget *parent = nullptr);
+
+    int countTimeOut = 0;
     ~Widget();
+
+
 
 public:
     QSerialPort *Serial = new QSerialPort();
@@ -56,7 +60,31 @@ private slots:
 
     void on_sbFontSize_valueChanged(int arg1);
 
+    void customInit();
+
+    void customTimeOut();
+
+    void updateXYMinMaxToCus();
+
+//    void horzScrollBarChanged(int value);
+//    void vertScrollBarChanged(int value);
+//    void xAxisChanged(QCPRange range);
+//    void yAxisChanged(QCPRange range);
+
 private:
     Ui::Widget *ui;
+
+
+
+    int MaxX = 100;
+    int MinX = 0;
+    int MaxY = 100;
+    int MinY = -100;
+    QTimer *timeStart = new QTimer();
+    //绘图数据更新间隔
+    int tIv = 30;
+    int *timeInterval = &tIv;
+    int yVal = 0;
+//testData
 };
 #endif // WIDGET_H

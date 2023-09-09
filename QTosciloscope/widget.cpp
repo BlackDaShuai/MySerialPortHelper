@@ -13,15 +13,8 @@ Widget::Widget(QWidget *parent)
 {
     ui->setupUi(this);
 
-
-
-    ui->cusplot->addGraph();
-
-    //设置xy轴的标签
-    ui->cusplot->xAxis->setLabel("时间");
-    ui->cusplot->yAxis->setLabel("值");
-    ui->cusplot->xAxis->setRange(0,5);
-    ui->cusplot->yAxis->setRange(-5,5);
+    customInit();
+    connect(timeStart,&QTimer::timeout,this,&Widget::customTimeOut);
 
     //设置默认波特率
     ui->cbBaudRate->setCurrentText("115200");
@@ -29,6 +22,13 @@ Widget::Widget(QWidget *parent)
     QList<int> sizes;
     sizes << 30000 << 50000;
     ui->splitter->setSizes(sizes);
+
+//    ui->horizontalScrollBar->setRange(-500,500);
+//    ui->verticalScrollBar->setRange(-500,500);
+//    connect(ui->horizontalScrollBar, SIGNAL(valueChanged(int)), this, SLOT(horzScrollBarChanged(int)));
+//    connect(ui->verticalScrollBar, SIGNAL(valueChanged(int)), this, SLOT(vertScrollBarChanged(int)));
+//    connect(ui->cusplot->xAxis, SIGNAL(rangeChanged(QCPRange)), this, SLOT(xAxisChanged(QCPRange)));
+//    connect(ui->cusplot->yAxis, SIGNAL(rangeChanged(QCPRange)), this, SLOT(yAxisChanged(QCPRange)));
 
     //保存当前字体，用于后续临时修改颜色
 //    QPalette pletRed;
@@ -40,7 +40,7 @@ Widget::Widget(QWidget *parent)
     //字体的spinbox初始大小
     ui->sbFontSize->setValue(9);
 
-    Widget::on_cbPortName_clicked();
+    on_cbPortName_clicked();
 
     //串口接收区刷新
     disconnect(Serial,&QSerialPort::readyRead,this,&Widget::showSerialData);
@@ -93,8 +93,12 @@ QRegularExpression hexRegex("[A-Fa-f0-9]{2}");
 QString Widget::upDateTime(bool arg)
 {
     QTime current_time =QTime::currentTime();
+
+
     if(arg)
     {
+
+        timeStart->start(*timeInterval);
 
         return "111111111111";
     }else
@@ -188,9 +192,10 @@ void Widget::on_open_clicked()
         if(Serial->open(QIODevice::ReadWrite)==false)
         {
             QMessageBox::warning(this, "提示", "串口打开失败或已被占用！", QMessageBox::Ok);
+
             return;
         }
-
+        timeStart->start();
         //打开成功，失能combobox
         ui->cbBaudRate->setEnabled(false);
         ui->cbDataBits->setEnabled(false);
@@ -206,6 +211,8 @@ void Widget::on_open_clicked()
         ui->receiveEdit->appendPlainText("串口已关闭！\r\n");
         ui->lbConnected->setText("当前未连接");
         Serial->close();
+//        ui->cusplot->
+        timeStart->stop();
         ui->cbBaudRate->setEnabled(true);
         ui->cbDataBits->setEnabled(true);
         ui->cbParity->setEnabled(true);
@@ -348,4 +355,53 @@ void Widget::on_sbFontSize_valueChanged(int arg1)
     ui->receiveEdit->setFont(font);
     ui->sendEdit->setFont(font);
 }
+
+void Widget::customInit()
+{
+
+    ui->cusplot->setBackground(Qt::white);
+
+    ui->cusplot->addGraph();//添加一条线
+
+    ui->cusplot->graph(0)->setPen(QPen(Qt::red));
+
+    ui->cusplot->xAxis->setLabel("时间");//设置xy轴的标签
+    ui->cusplot->yAxis->setLabel("值");
+
+    upDateTime(1);//开始计时
+    ui->cusplot->axisRect()->setRangeZoom(Qt::Vertical);
+
+    updateXYMinMaxToCus();
+
+    ui->cusplot->replot();
+}
+
+void Widget::customTimeOut()
+{
+    if(countTimeOut<100)
+    {
+         countTimeOut++;
+        yVal++;
+    }else
+    {
+         countTimeOut++;
+         yVal--;
+    }
+
+
+
+    ui->cusplot->graph(0)->addData(countTimeOut,yVal);
+//    updateXYMinMaxToCus();
+    //自动更新坐标轴
+    ui->cusplot->graph(0)->rescaleAxes(true);
+    ui->cusplot->replot();
+}
+
+//更新坐标轴最大值
+void Widget::updateXYMinMaxToCus()
+{
+//    ui->cusplot->xAxis->setRange(countTimeOut,100,Qt::AlignRight);//设置默认坐标轴值
+//    ui->cusplot->yAxis->setRange(countTimeOut,countTimeOut,Qt::AlignCenter);
+}
+
 
